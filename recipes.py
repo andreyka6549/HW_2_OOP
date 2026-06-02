@@ -1,3 +1,4 @@
+from enum import Enum
 from numbers import Number
 
 class Ingredient:
@@ -93,3 +94,24 @@ class ShoppingList:
         new_list = ShoppingList()
         new_list._items = new_items
         return new_list
+
+
+class Category(Enum):
+    VEGAN = "веган"
+    GLUTEN_FREE = "без глютена"
+    KETO = "кето"
+
+class DietaryRecipe(Recipe):
+    def __init__(self, title: str, diet_type: Category, ingredients: list[Ingredient] | None = None) -> None:
+        super().__init__(title)
+        self.diet_type: Category = diet_type
+        if ingredients is not None:
+            self.ingredients = ingredients
+
+    def scale(self, ratio: float) -> "DietaryRecipe":
+        scaled_recipe: Recipe = super().scale(ratio)
+        obj: DietaryRecipe = DietaryRecipe(self.title, self.diet_type, scaled_recipe.ingredients)
+        return obj
+
+    def __str__(self) -> str:
+        return f"[{self.diet_type.value}] " + super().__str__()
