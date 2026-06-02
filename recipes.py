@@ -57,3 +57,39 @@ class Recipe:
 
     def __str__(self) -> str:
         return f"{self.title}. Список ингридиентов: {self.ingredients}"
+
+
+class ShoppingList:
+    def __init__(self) -> None:
+        self._items: list[tuple[Ingredient, str]] = []
+
+    def add_recipe(self, recipe: Recipe, portions: float) -> None:
+        if portions <= 0:
+            raise ValueError("Количество порций должно быть положительным")
+        new_recipe: Recipe = recipe.scale(portions)
+        for ingredient in new_recipe.ingredients:
+            self._items.append((ingredient, new_recipe.title))
+
+    def remove_recipe(self, title: str) -> None:
+        for i in range(len(self._items) - 1, -1, -1):
+            if self._items[i][1] == title:
+                self._items.pop(i)
+
+    def get_list(self) -> list[Ingredient]:
+        d: dict[tuple[str, str], float] = {}
+        for item in self._items:
+            key = (item[0].name, item[0].unit)
+            if d.get(key, None) is not None:
+                d[key] += item[0].quantity
+            else:
+                d[key] = item[0].quantity
+
+        ret: list[Ingredient] = [Ingredient(name, quantity, unit) for (name, unit), quantity in d.items()]
+        ret.sort(key=lambda x: x.name)
+        return ret
+
+    def __add__(self, other: "ShoppingList") -> "ShoppingList":
+        new_items = [(Ingredient(ing.name, ing.quantity, ing.unit), title) for ing, title in (self._items + other._items)]
+        new_list = ShoppingList()
+        new_list._items = new_items
+        return new_list
