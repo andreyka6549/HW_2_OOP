@@ -54,3 +54,6 @@ class Recipe:
 
     def __len__(self) -> int:
         return len(self.ingredients)
+
+    def __str__(self) -> str:
+        return f"{self.title}. Список ингридиентов: {self.ingredients}"
